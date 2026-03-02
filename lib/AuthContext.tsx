@@ -5,7 +5,7 @@ import { createContext, useContext, useState, useCallback } from "react";
 interface Profile {
   id: string;
   name: string;
-  role: string;
+  role: string | null;
   username: string;
 }
 
