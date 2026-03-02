@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import type { PostType } from "@/lib/types";
 import PostList from "@/components/PostList";
@@ -21,8 +21,17 @@ function HomePageContent() {
   const [showModal, setShowModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const { profile } = useAuth();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("q") ?? "";
+
+  function handleNewPost() {
+    if (!profile) {
+      router.push("/login");
+    } else {
+      setShowModal(true);
+    }
+  }
 
   return (
     <div className="flex gap-4 pt-4 pb-12 items-start">
@@ -39,7 +48,7 @@ function HomePageContent() {
               Share help, jobs, events and projects with your local community.
             </p>
             <button
-              onClick={() => setShowModal(true)}
+              onClick={handleNewPost}
               className="mt-3 w-full text-sm font-semibold py-1.5 rounded-md bg-[#42dfe1] text-gray-900 hover:bg-[#2ecbcd] transition-colors"
             >
               Write a post
@@ -114,7 +123,7 @@ function HomePageContent() {
             {BOARDS.find((b) => b.type === activeTab)?.label}
           </span>
           <button
-            onClick={() => setShowModal(true)}
+            onClick={handleNewPost}
             className="text-sm font-semibold text-[#1a9a9c] hover:underline"
           >
             + New post

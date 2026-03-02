@@ -34,13 +34,13 @@ export default function SearchBar() {
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Search LocalHub…"
-        className="w-full text-sm border border-gray-300 rounded-md px-3 py-1.5 pr-8 bg-gray-50 text-gray-800 focus:outline-none focus:ring-1 focus:ring-[#42dfe1] focus:border-[#42dfe1] transition-colors"
+        className="w-full text-sm border border-white/20 rounded-md px-3 py-1.5 pr-8 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:ring-1 focus:ring-[#42dfe1] focus:border-[#42dfe1] transition-colors"
       />
       {q && (
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-base leading-none"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-white/50 hover:text-white text-base leading-none"
         >
           ×
         </button>

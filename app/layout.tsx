@@ -25,41 +25,39 @@ export default async function RootLayout({
     <html lang="en">
       <body className="min-h-screen bg-[#f5f5f5] text-gray-900 text-[16px]">
         <AuthProvider initialProfile={profile}>
-        {/* Top nav */}
-        <header className="sticky top-0 z-40 bg-white border-b border-[#42dfe1]/40 h-12 flex items-center px-4">
-          <div className="w-full max-w-7xl mx-auto flex items-center gap-3">
-            {/* Logo */}
-            <Link href="/" className="flex items-center shrink-0">
-              <Image
-                src="/images/logo.png"
-                alt="LocalHub"
-                width={120}
-                height={32}
-                className="h-8 w-auto"
-                priority
-              />
-            </Link>
+          {/* Top nav */}
+          <header className="sticky top-0 z-40 bg-[#1E1F59] border-b border-[#42dfe1]/30 h-12 flex items-center px-4">
+            <div className="w-full max-w-7xl mx-auto flex items-center gap-3">
+              {/* Logo */}
+              <Link href="/" className="flex items-center shrink-0">
+                <Image
+                  src="/images/logo.png"
+                  alt="LocalHub"
+                  width={120}
+                  height={32}
+                  className="h-8 w-auto"
+                  priority
+                />
+              </Link>
 
-            {/* Search */}
-            <Suspense
-              fallback={
-                <div className="hidden sm:flex flex-1 max-w-md">
-                  <div className="w-full h-8 bg-gray-100 rounded-md animate-pulse" />
-                </div>
-              }
-            >
-              <SearchBar />
-            </Suspense>
+              {/* Search */}
+              <Suspense
+                fallback={
+                  <div className="hidden sm:flex flex-1 max-w-md">
+                    <div className="w-full h-8 bg-gray-100 rounded-md animate-pulse" />
+                  </div>
+                }
+              >
+                <SearchBar />
+              </Suspense>
 
-            <div className="ml-auto">
-              <HeaderNav />
+              <div className="ml-auto">
+                <HeaderNav />
+              </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-        <div className="w-full max-w-7xl mx-auto px-4">
-          {children}
-        </div>
+          <div className="w-full max-w-7xl mx-auto px-4">{children}</div>
         </AuthProvider>
       </body>
     </html>
