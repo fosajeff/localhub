@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
 import { prisma } from "@/lib/prisma";
+import { cache } from "react";
 
 const COOKIE_NAME = "localhub_session";
 const ALG = "HS256";
@@ -35,8 +36,10 @@ export function getSessionCookieOptions() {
 }
 
 // ─── Read & verify ────────────────────────────────────────────────────────────
+// Wrapped with React cache() so it runs at most once per server request,
+// preventing duplicate DB queries when the layout + route both call it.
 
-export async function getCurrentProfile() {
+export const getCurrentProfile = cache(async function getCurrentProfile() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get(COOKIE_NAME)?.value;
@@ -55,4 +58,4 @@ export async function getCurrentProfile() {
   } catch {
     return null;
   }
-}
+});

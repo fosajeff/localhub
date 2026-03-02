@@ -2,29 +2,37 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { PostType } from "@/lib/types";
+import type { PostType, PostWithAuthor } from "@/lib/types";
 import TagInput from "./TagInput";
 
 interface CreatePostModalProps {
   defaultType: PostType;
   onClose: () => void;
   onCreated: () => void;
+  editPost?: PostWithAuthor;
 }
 
 export default function CreatePostModal({
   defaultType,
   onClose,
   onCreated,
+  editPost,
 }: CreatePostModalProps) {
   const router = useRouter();
-  const [type, setType] = useState<PostType>(defaultType);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
-  const [contactLink, setContactLink] = useState("");
-  const [eventDate, setEventDate] = useState("");
-  const [location, setLocation] = useState("");
-  const [helpType, setHelpType] = useState<"request" | "offer">("request");
+  const [type, setType] = useState<PostType>(editPost?.type ?? defaultType);
+  const [title, setTitle] = useState(editPost?.title ?? "");
+  const [description, setDescription] = useState(editPost?.description ?? "");
+  const [tags, setTags] = useState<string[]>(editPost?.tags ?? []);
+  const [contactLink, setContactLink] = useState(editPost?.contactLink ?? "");
+  const [eventDate, setEventDate] = useState(
+    editPost?.eventDate
+      ? new Date(editPost.eventDate).toISOString().slice(0, 16)
+      : "",
+  );
+  const [location, setLocation] = useState(editPost?.location ?? "");
+  const [helpType, setHelpType] = useState<"request" | "offer">(
+    editPost?.helpType ?? "request",
+  );
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -51,8 +59,11 @@ export default function CreatePostModal({
     }
 
     try {
-      const res = await fetch("/api/posts", {
-        method: "POST",
+      const url = editPost ? `/api/posts/${editPost.id}` : "/api/posts";
+      const method = editPost ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
@@ -80,7 +91,9 @@ export default function CreatePostModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-bold text-gray-900">Create a post</h2>
+          <h2 className="text-lg font-bold text-gray-900">
+            {editPost ? "Edit post" : "Create a post"}
+          </h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-700 text-xl leading-none"
@@ -234,9 +247,15 @@ export default function CreatePostModal({
             <button
               type="submit"
               disabled={submitting}
-              className="px-5 py-2 text-sm rounded-md bg-indigo-600 text-white font-medium hover:bg-indigo-700 disabled:opacity-50"
+              className="px-5 py-2 text-sm rounded-md bg-[#42dfe1] text-gray-900 font-medium hover:bg-[#2ecbcd] disabled:opacity-50"
             >
-              {submitting ? "Posting…" : "Post"}
+              {submitting
+                ? editPost
+                  ? "Saving…"
+                  : "Posting…"
+                : editPost
+                  ? "Save changes"
+                  : "Post"}
             </button>
           </div>
         </form>

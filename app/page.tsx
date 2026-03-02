@@ -1,10 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import type { PostType } from "@/lib/types";
 import PostList from "@/components/PostList";
 import CreatePostModal from "@/components/CreatePostModal";
 import CommunityBanner from "@/components/CommunityBanner";
+import { useAuth } from "@/lib/AuthContext";
 
 const BOARDS: { type: PostType; label: string; icon: string }[] = [
   { type: "help", label: "HelpDesk", icon: "🆘" },
@@ -17,6 +20,9 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState<PostType>("help");
   const [showModal, setShowModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const { profile } = useAuth();
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("q") ?? "";
 
   return (
     <div className="flex gap-4 pt-4 pb-12 items-start">
@@ -24,7 +30,7 @@ export default function HomePage() {
       <aside className="hidden lg:flex flex-col gap-1 w-55 shrink-0 sticky top-14">
         {/* Brand blurb */}
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-2">
-          <div className="h-8 bg-linear-to-r from-indigo-500 to-violet-500" />
+          <div className="h-8 bg-linear-to-r from-[#42dfe1] to-[#78b4dc]" />
           <div className="px-4 pb-4 pt-3">
             <p className="font-bold text-gray-900 text-sm">
               LocalHub community workspace
@@ -34,16 +40,18 @@ export default function HomePage() {
             </p>
             <button
               onClick={() => setShowModal(true)}
-              className="mt-3 w-full text-sm font-semibold py-1.5 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+              className="mt-3 w-full text-sm font-semibold py-1.5 rounded-md bg-[#42dfe1] text-gray-900 hover:bg-[#2ecbcd] transition-colors"
             >
               Write a post
             </button>
-            <a
-              href="/login"
-              className="mt-2 w-full text-sm font-medium py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center"
-            >
-              Log in
-            </a>
+            {!profile && (
+              <a
+                href="/login"
+                className="mt-2 w-full text-sm font-medium py-1.5 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center"
+              >
+                Log in
+              </a>
+            )}
           </div>
         </div>
 
@@ -56,7 +64,7 @@ export default function HomePage() {
               className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded transition-colors text-left
                 ${
                   activeTab === b.type
-                    ? "bg-indigo-50 text-indigo-700 font-semibold"
+                    ? "bg-[#42dfe1]/15 text-gray-900 font-semibold"
                     : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
             >
@@ -78,7 +86,7 @@ export default function HomePage() {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap shrink-0 border transition-colors
                 ${
                   activeTab === b.type
-                    ? "bg-indigo-600 text-white border-indigo-600"
+                    ? "bg-[#42dfe1] text-gray-900 border-[#42dfe1]"
                     : "bg-white text-gray-600 border-gray-300 hover:border-gray-400"
                 }`}
             >
@@ -89,28 +97,35 @@ export default function HomePage() {
 
         {/* Hero banner */}
         <div className="rounded-lg overflow-hidden mb-3 border border-gray-200">
-          <img
+          <Image
             src="/images/localhub.png"
             alt="LocalHub"
+            width={1280}
+            height={320}
             className="w-full object-cover max-h-40"
+            priority
           />
         </div>
 
         {/* Board label + new post */}
         <div className="flex items-center justify-between mb-3 px-1">
-          <span className="text-sm font-semibold text-gray-800">
+          <span className="text-sm font-semibold text-white">
             {BOARDS.find((b) => b.type === activeTab)?.icon}{" "}
             {BOARDS.find((b) => b.type === activeTab)?.label}
           </span>
           <button
             onClick={() => setShowModal(true)}
-            className="text-sm font-semibold text-indigo-600 hover:underline"
+            className="text-sm font-semibold text-[#1a9a9c] hover:underline"
           >
             + New post
           </button>
         </div>
 
-        <PostList key={`${activeTab}-${refreshKey}`} type={activeTab} />
+        <PostList
+          key={`${activeTab}-${refreshKey}-${searchQuery}`}
+          type={activeTab}
+          searchQuery={searchQuery}
+        />
       </main>
 
       {/* ── RIGHT SIDEBAR ────────────────────────────── */}

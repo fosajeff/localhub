@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAuth } from "@/lib/AuthContext";
 
 interface Summary {
   total: number;
@@ -21,6 +22,7 @@ const BOARD_META: Record<
 
 export default function CommunityBanner() {
   const [summary, setSummary] = useState<Summary | null>(null);
+  const { profile } = useAuth();
 
   useEffect(() => {
     fetch("/api/summary")
@@ -33,8 +35,8 @@ export default function CommunityBanner() {
     <div className="flex flex-col gap-3">
       {/* This week */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="bg-linear-to-r from-indigo-600 to-indigo-500 px-4 py-3">
-          <h3 className="text-sm font-bold text-white">
+        <div className="bg-linear-to-r from-[#42dfe1] to-[#78b4dc] px-4 py-3">
+          <h3 className="text-sm font-bold text-gray-900">
             This week in LocalHub
           </h3>
         </div>
@@ -55,7 +57,7 @@ export default function CommunityBanner() {
                       <span className="text-gray-700">{meta.label}</span>
                     </span>
                     <span
-                      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${count > 0 ? "bg-indigo-100 text-indigo-700" : "bg-gray-100 text-gray-400"}`}
+                      className={`text-xs font-semibold px-2 py-0.5 rounded-full ${count > 0 ? "bg-[#42dfe1]/20 text-gray-800" : "bg-gray-100 text-gray-400"}`}
                     >
                       {count}
                     </span>
@@ -90,12 +92,14 @@ export default function CommunityBanner() {
           ask for help and organise events.
         </p>
         <div className="mt-3 flex flex-col gap-1.5">
-          <a
-            href="/login"
-            className="text-xs text-center font-semibold py-1.5 rounded bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
-          >
-            Sign in
-          </a>
+          {!profile && (
+            <a
+              href="/login"
+              className="text-xs text-center font-semibold py-1.5 rounded bg-[#42dfe1] text-gray-900 hover:bg-[#2ecbcd] transition-colors"
+            >
+              Sign in
+            </a>
+          )}
         </div>
       </div>
     </div>

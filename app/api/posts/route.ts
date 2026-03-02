@@ -23,16 +23,27 @@ export async function GET(req: NextRequest) {
   const type = searchParams.get("type") ?? undefined;
   const status = searchParams.get("status") ?? undefined;
   const tag = searchParams.get("tag") ?? undefined;
+  const q = searchParams.get("q") ?? undefined;
 
   type WhereClause = {
     type?: "job" | "event" | "help" | "project" | "article";
     status?: "open" | "closed" | "resolved";
     tags?: { has: string };
+    OR?: Array<{
+      title?: { contains: string; mode: "insensitive" };
+      description?: { contains: string; mode: "insensitive" };
+    }>;
   };
   const where: WhereClause = {};
   if (type) where.type = type as WhereClause["type"];
   if (status) where.status = status as WhereClause["status"];
   if (tag) where.tags = { has: tag };
+  if (q) {
+    where.OR = [
+      { title: { contains: q, mode: "insensitive" } },
+      { description: { contains: q, mode: "insensitive" } },
+    ];
+  }
 
   const posts = await prisma.post.findMany({
     where,

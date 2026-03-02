@@ -4,51 +4,29 @@ import { useEffect, useState, useCallback } from "react";
 import type { PostWithAuthor, PostType, PostStatus } from "@/lib/types";
 import PostCard from "./PostCard";
 
-const BOARD_TAGS: Record<PostType, string[]> = {
-  help: [
-    "urgent",
-    "react",
-    "nextjs",
-    "css",
-    "python",
-    "backend",
-    "design",
-    "typescript",
-  ],
-  job: [
-    "remote",
-    "fulltime",
-    "parttime",
-    "contract",
-    "frontend",
-    "backend",
-    "design",
-  ],
-  event: ["meetup", "workshop", "online", "free", "networking", "hackathon"],
-  project: ["opensource", "collab", "mvp", "frontend", "backend", "mobile"],
-  article: ["tutorial", "opinion", "announcement", "guide", "tips", "news"],
-};
-
 interface PostListProps {
   type: PostType;
+  searchQuery?: string;
 }
 
-export default function PostList({ type }: PostListProps) {
+export default function PostList({ type, searchQuery = "" }: PostListProps) {
   const [posts, setPosts] = useState<PostWithAuthor[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<PostStatus | "">("");
   const [tagFilter, setTagFilter] = useState("");
+  const [tagInput, setTagInput] = useState("");
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
     const params = new URLSearchParams({ type });
     if (statusFilter) params.set("status", statusFilter);
     if (tagFilter.trim()) params.set("tag", tagFilter.trim().toLowerCase());
+    if (searchQuery.trim()) params.set("q", searchQuery.trim());
     const res = await fetch(`/api/posts?${params}`);
     const data = await res.json();
     setPosts(data);
     setLoading(false);
-  }, [type, statusFilter, tagFilter]);
+  }, [type, statusFilter, tagFilter, searchQuery]);
 
   useEffect(() => {
     fetchPosts();
@@ -58,53 +36,52 @@ export default function PostList({ type }: PostListProps) {
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, status } : p)));
   }
 
-  function toggleTag(tag: string) {
-    setTagFilter((prev) => (prev === tag ? "" : tag));
+  function handleDelete(id: string) {
+    setPosts((prev) => prev.filter((p) => p.id !== id));
+  }
+
+  function applyTagFilter() {
+    setTagFilter(tagInput.trim().toLowerCase());
+  }
+
+  function clearTagFilter() {
+    setTagInput("");
+    setTagFilter("");
   }
 
   return (
     <div className="space-y-2">
       {/* Filter bar */}
-      <div className="space-y-2 px-1 mb-2">
-        {/* Status */}
-        <div className="flex items-center gap-2">
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as PostStatus | "")}
-            className="text-xs border border-gray-300 rounded-md px-2.5 py-1.5 bg-white text-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-300"
-          >
-            <option value="">All statuses</option>
-            <option value="open">Open</option>
-            <option value="closed">Closed</option>
-            <option value="resolved">Resolved</option>
-          </select>
+      <div className="flex flex-wrap items-center gap-2 px-1 mb-2">
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as PostStatus | "")}
+          className="text-xs border border-gray-300 rounded-md px-2.5 py-1.5 bg-white text-gray-600 focus:outline-none focus:ring-1 focus:ring-[#42dfe1]"
+        >
+          <option value="">All statuses</option>
+          <option value="open">Open</option>
+          <option value="closed">Closed</option>
+          <option value="resolved">Resolved</option>
+        </select>
+
+        <div className="flex items-center gap-1">
+          <input
+            type="text"
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && applyTagFilter()}
+            onBlur={applyTagFilter}
+            placeholder="#tag filter"
+            className="text-xs border border-gray-300 rounded-md px-2.5 py-1.5 bg-white text-gray-600 focus:outline-none focus:ring-1 focus:ring-[#42dfe1] w-28"
+          />
           {tagFilter && (
-            <span className="text-xs text-indigo-600 font-medium">
-              #{tagFilter}
-              <button
-                onClick={() => setTagFilter("")}
-                className="ml-1 text-gray-400 hover:text-gray-600"
-              >
-                ✕
-              </button>
-            </span>
-          )}
-        </div>
-        {/* Tag chips */}
-        <div className="flex flex-wrap gap-1.5">
-          {BOARD_TAGS[type].map((tag) => (
             <button
-              key={tag}
-              onClick={() => toggleTag(tag)}
-              className={`text-xs px-2.5 py-1 rounded-full border transition-colors ${
-                tagFilter === tag
-                  ? "bg-indigo-600 text-white border-indigo-600"
-                  : "bg-white text-gray-600 border-gray-300 hover:border-indigo-400 hover:text-indigo-600"
-              }`}
+              onClick={clearTagFilter}
+              className="text-xs text-gray-400 hover:text-gray-600"
             >
-              #{tag}
+              ✕
             </button>
-          ))}
+          )}
         </div>
       </div>
 
@@ -144,6 +121,8 @@ export default function PostList({ type }: PostListProps) {
               key={post.id}
               post={post}
               onStatusChange={handleStatusChange}
+              onDelete={handleDelete}
+              onUpdated={fetchPosts}
               hideType
             />
           ))}

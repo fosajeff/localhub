@@ -2,6 +2,8 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -41,12 +43,15 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="text-center mb-8">
-          <a href="/" className="inline-flex items-center gap-2 mb-4">
-            <span className="bg-gray-900 text-white text-sm font-bold px-2 py-1 rounded">
-              LH
-            </span>
-            <span className="font-bold text-xl text-gray-900">LocalHub</span>
-          </a>
+          <Link href="/" className="inline-flex items-center gap-2 mb-4">
+            <Image
+              src="/images/logo.png"
+              alt="LocalHub"
+              width={120}
+              height={40}
+              className="h-10 w-auto"
+            />
+          </Link>
           <p className="text-sm text-gray-500">
             Sign in to your community account
           </p>
@@ -73,7 +78,7 @@ export default function LoginPage() {
               autoComplete="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-colors"
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#42dfe1]/50 focus:border-[#42dfe1] transition-colors"
               placeholder="alice"
             />
           </div>
@@ -92,7 +97,7 @@ export default function LoginPage() {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 transition-colors"
+              className="w-full border border-gray-300 rounded px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#42dfe1]/50 focus:border-[#42dfe1] transition-colors"
             />
           </div>
 
@@ -105,16 +110,16 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 rounded bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            className="w-full py-2 rounded bg-[#42dfe1] text-gray-900 text-sm font-semibold hover:bg-[#2ecbcd] transition-colors disabled:opacity-50"
           >
             {loading ? "Signing in…" : "Continue"}
           </button>
         </form>
 
         <p className="text-center text-xs text-gray-400 mt-5">
-          <a href="/" className="hover:text-gray-700 underline">
+          <Link href="/" className="hover:text-gray-700 underline">
             ← Back to LocalHub
-          </a>
+          </Link>
         </p>
       </div>
     </div>
