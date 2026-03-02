@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+    // Uncomment if using Neon connection pooling:
+    // directUrl = env("DIRECT_URL")
+}
+
+// ─────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────
+
+enum PostType {
+    job
+    event
+    help
+    project
+    article
+}
+
+enum PostStatus {
+    open
+    closed
+    resolved
+}
+
+enum HelpType {
+    request
+    offer
+}
+
+// ─────────────────────────────────────────
+// Profile
+// ─────────────────────────────────────────
+
+model Profile {
+    id           String   @id @default(cuid())
+    name         String
+    role         String?
+    contactLink  String?
+    username     String   @unique
+    passwordHash String
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+
+    posts Post[]
+}
+
+// ─────────────────────────────────────────
+// Post
+// ─────────────────────────────────────────
+
+model Post {
+    id          String     @id @default(cuid())
+    title       String
+    description String
+    type        PostType
+    status      PostStatus @default(open)
+    tags        String[] // Postgres text[]
+    contactLink String?
+
+    // optional fields used by specific boards
+    eventDate DateTime?
+    location  String?
+    helpType  HelpType?
+
+    authorId String
+    author   Profile @relation(fields: [authorId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([type])
+    @@index([status])
+    @@index([authorId])
+    @@index([createdAt])
+}
