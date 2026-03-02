@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import type { PostType } from "@/lib/types";
@@ -16,7 +16,7 @@ const BOARDS: { type: PostType; label: string; icon: string }[] = [
   { type: "project", label: "Projects", icon: "🚀" },
 ];
 
-export default function HomePage() {
+function HomePageContent() {
   const [activeTab, setActiveTab] = useState<PostType>("help");
   const [showModal, setShowModal] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -109,7 +109,7 @@ export default function HomePage() {
 
         {/* Board label + new post */}
         <div className="flex items-center justify-between mb-3 px-1">
-          <span className="text-sm font-semibold text-white">
+          <span className="text-sm font-semibold text-black">
             {BOARDS.find((b) => b.type === activeTab)?.icon}{" "}
             {BOARDS.find((b) => b.type === activeTab)?.label}
           </span>
@@ -141,5 +141,13 @@ export default function HomePage() {
         />
       )}
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense>
+      <HomePageContent />
+    </Suspense>
   );
 }

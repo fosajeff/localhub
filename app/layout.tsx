@@ -24,6 +24,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-[#f5f5f5] text-gray-900 text-[16px]">
+        <AuthProvider initialProfile={profile}>
         {/* Top nav */}
         <header className="sticky top-0 z-40 bg-white border-b border-[#42dfe1]/40 h-12 flex items-center px-4">
           <div className="w-full max-w-7xl mx-auto flex items-center gap-3">
@@ -57,8 +58,9 @@ export default async function RootLayout({
         </header>
 
         <div className="w-full max-w-7xl mx-auto px-4">
-          <AuthProvider initialProfile={profile}>{children}</AuthProvider>
+          {children}
         </div>
+        </AuthProvider>
       </body>
     </html>
   );
